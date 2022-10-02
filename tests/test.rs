@@ -34,5 +34,5 @@ fn test_contextmanager() {
     with(&mut TestCTM::new(), |this| {
         assert_eq!(1, this.calls);
         this.name = "New name".to_string();
-    })
+    });
 }
