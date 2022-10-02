@@ -18,7 +18,7 @@ impl Timer {
     pub fn duration(&self) -> Option<Duration> {
         match self.end?.duration_since(self.start?) {
             Ok(duration) => Some(duration),
-            Err(_) => None
+            Err(_) => None,
         }
     }
 }
@@ -38,7 +38,7 @@ fn test_timer() {
     let mut timer = Timer::new();
     with(&mut timer, |this| {
         assert!(this.start.is_some());
-        println!("Start: {:?}, end: {:?}", this.start, this.end,);
+        println!("Start: {:?}, end: {:?}", this.start, this.end);
         assert!(this.end.is_none());
         assert!(this.duration().is_none());
     });
