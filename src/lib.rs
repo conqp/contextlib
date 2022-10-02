@@ -1,3 +1,6 @@
+use std::collections::HashSet;
+use std::hash::Hash;
+
 pub trait Contextmanager<T, R> {
     fn enter(&mut self) {}
 
@@ -12,7 +15,7 @@ pub trait Contextmanager<T, R> {
 
 #[derive(Debug)]
 pub struct Suppress<E> {
-    errors: Vec<E>,
+    errors: HashSet<E>,
 }
 
 pub fn suppress<T, E>(result: Result<T, E>) -> Option<T> {
@@ -23,7 +26,7 @@ pub fn suppress<T, E>(result: Result<T, E>) -> Option<T> {
 }
 
 impl<E> Suppress<E> {
-    pub fn new(errors: impl Into<Vec<E>>) -> Self {
+    pub fn new(errors: impl Into<HashSet<E>>) -> Self {
         Self {
             errors: errors.into(),
         }
@@ -32,13 +35,13 @@ impl<E> Suppress<E> {
 
 impl<E, T> Contextmanager<Result<T, E>, Result<Option<T>, E>> for Suppress<E>
 where
-    E: Eq + Clone,
+    E: Eq + Clone + Hash,
     T: Clone,
 {
     fn exit(&mut self, result: &Result<T, E>) -> Result<Option<T>, E> {
         match result {
             Err(error) => {
-                if self.errors.iter().any(|item| item == error) {
+                if self.errors.contains(error) {
                     Ok(None)
                 } else {
                     Err(error.clone())
