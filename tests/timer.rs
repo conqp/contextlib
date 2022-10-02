@@ -16,15 +16,9 @@ impl Timer {
     }
 
     pub fn duration(&self) -> Option<Duration> {
-        match self.end {
-            Some(end) => match self.start {
-                Some(start) => match end.duration_since(start) {
-                    Ok(duration) => Some(duration),
-                    Err(_) => None,
-                },
-                None => None,
-            },
-            None => None,
+        match self.end?.duration_since(self.start?) {
+            Ok(duration) => Some(duration),
+            Err(_) => None
         }
     }
 }
