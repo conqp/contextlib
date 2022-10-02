@@ -1,7 +1,10 @@
-use contextlib::Contextmanager;
+use contextlib::{Contextmanager,Suppress};
 
 mod counter;
 use counter::Counter;
+
+mod errors;
+use errors::ErrorsToSuppress;
 
 mod timer;
 use timer::Timer;
@@ -29,4 +32,43 @@ fn test_timer() {
     assert!(timer.end().is_some());
     assert!(duration.is_some());
     println!("Duration: {:?}", duration);
+}
+
+#[test]
+fn test_suppress() {
+    let mut suppress = Suppress::new([ErrorsToSuppress::NotAFizzbuzz]);
+
+    let suppressed_error = suppress.with(|_| {
+        if false {
+            Ok("Infer type &str")
+        } else {
+            Err(ErrorsToSuppress::NotAFizzbuzz)
+        }
+    });
+
+    assert!(suppressed_error.is_ok());
+    assert_eq!(None, suppressed_error.unwrap());
+
+    let suppressed_error = suppress.with(|_| {
+        if false {
+            Ok("Infer type &str")
+        } else {
+            Err(ErrorsToSuppress::FoobarOutOfRange)
+        }
+    });
+
+    assert!(suppressed_error.is_err());
+    assert_eq!(ErrorsToSuppress::FoobarOutOfRange, suppressed_error.err().unwrap());
+
+    let suppressed_error = suppress.with(|_| {
+        if true {
+            Ok("That worked.")
+        } else {
+            Err(ErrorsToSuppress::FoobarOutOfRange)   // Infer error type
+        }
+    });
+
+    assert!(suppressed_error.is_ok());
+    assert!(suppressed_error.unwrap().is_some());
+    assert_eq!("That worked.", suppressed_error.unwrap().unwrap());
 }
