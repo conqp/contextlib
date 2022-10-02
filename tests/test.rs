@@ -1,4 +1,6 @@
-use contextlib::{Contextmanager,Suppress};
+use std::fs::read_to_string;
+
+use contextlib::{Contextmanager,Suppress, suppress};
 
 mod counter;
 use counter::Counter;
@@ -35,7 +37,7 @@ fn test_timer() {
 }
 
 #[test]
-fn test_suppress() {
+fn test_suppress_ctm() {
     let mut suppress = Suppress::new([ErrorsToSuppress::NotAFizzbuzz]);
 
     let suppressed_error = suppress.with(|_| {
@@ -71,4 +73,10 @@ fn test_suppress() {
     assert!(suppressed_error.is_ok());
     assert!(suppressed_error.unwrap().is_some());
     assert_eq!("That worked.", suppressed_error.unwrap().unwrap());
+}
+
+#[test]
+fn test_suppress_fn() {
+    let result = suppress(read_to_string("tests/no-such-file"));
+    assert_eq!(None, result);
 }

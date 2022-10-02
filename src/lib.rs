@@ -15,6 +15,13 @@ pub struct Suppress<E> {
     errors: Vec<E>,
 }
 
+pub fn suppress<T, E>(result: Result<T, E>) -> Option<T> {
+    match result {
+        Ok(value) => Some(value),
+        Err(_) => None,
+    }
+}
+
 impl<E> Suppress<E> {
     pub fn new(errors: impl Into<Vec<E>>) -> Self {
         Self { errors: errors.into() }
