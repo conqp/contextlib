@@ -31,12 +31,13 @@ impl Timer {
     }
 }
 
-impl Contextmanager for Timer {
+impl Contextmanager<(), Option<Duration>> for Timer {
     fn enter(&mut self) {
         self.start = Some(SystemTime::now());
     }
 
-    fn exit(&mut self) {
+    fn exit(&mut self, _: &()) -> Option<Duration> {
         self.end = Some(SystemTime::now());
+        self.duration()
     }
 }

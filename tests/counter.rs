@@ -15,12 +15,12 @@ impl Counter {
     }
 }
 
-impl Contextmanager for Counter {
+impl Contextmanager<(), ()> for Counter {
     fn enter(&mut self) {
         self.calls += 1;
     }
 
-    fn exit(&mut self) {
+    fn exit(&mut self, _: &()) {
         self.calls -= 1;
     }
 }
