@@ -1,6 +1,6 @@
 use std::fs::read_to_string;
 
-use contextlib::{Contextmanager,Suppress, suppress};
+use contextlib::{suppress, Contextmanager, Suppress};
 
 mod counter;
 use counter::Counter;
@@ -60,13 +60,16 @@ fn test_suppress_ctm() {
     });
 
     assert!(suppressed_error.is_err());
-    assert_eq!(ErrorsToSuppress::FoobarOutOfRange, suppressed_error.err().unwrap());
+    assert_eq!(
+        ErrorsToSuppress::FoobarOutOfRange,
+        suppressed_error.err().unwrap()
+    );
 
     let suppressed_error = suppress.with(|_| {
         if true {
             Ok("That worked.")
         } else {
-            Err(ErrorsToSuppress::FoobarOutOfRange)   // Infer error type
+            Err(ErrorsToSuppress::FoobarOutOfRange) // Infer error type
         }
     });
 

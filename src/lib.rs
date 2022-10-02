@@ -24,23 +24,27 @@ pub fn suppress<T, E>(result: Result<T, E>) -> Option<T> {
 
 impl<E> Suppress<E> {
     pub fn new(errors: impl Into<Vec<E>>) -> Self {
-        Self { errors: errors.into() }
+        Self {
+            errors: errors.into(),
+        }
     }
 }
 
 impl<E, T> Contextmanager<Result<T, E>, Result<Option<T>, E>> for Suppress<E>
 where
     E: Eq + Clone,
-    T: Clone
+    T: Clone,
 {
     fn exit(&mut self, result: &Result<T, E>) -> Result<Option<T>, E> {
         match result {
-            Err(error) => if self.errors.iter().any(|item| item == error) {
-                Ok(None)
-            } else {
-                Err(error.clone())
+            Err(error) => {
+                if self.errors.iter().any(|item| item == error) {
+                    Ok(None)
+                } else {
+                    Err(error.clone())
+                }
             }
-            Ok(value) => Ok(Some(value.clone()))
+            Ok(value) => Ok(Some(value.clone())),
         }
     }
 }
