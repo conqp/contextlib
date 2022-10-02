@@ -1,4 +1,4 @@
-use contextlib::with;
+use contextlib::Contextmanager;
 
 mod counter;
 use counter::Counter;
@@ -10,7 +10,7 @@ use timer::Timer;
 fn test_basic_ctm() {
     let mut counter = Counter::new();
 
-    with(&mut counter, |this| {
+    counter.with(|this| {
         assert_eq!(1, this.calls());
     });
     assert_eq!(0, counter.calls());
@@ -20,7 +20,7 @@ fn test_basic_ctm() {
 fn test_timer() {
     let mut timer = Timer::new();
 
-    with(&mut timer, |this| {
+    timer.with(|this| {
         assert!(this.start().is_some());
         println!("Start: {:?}, end: {:?}", this.start(), this.end());
         assert!(this.end().is_none());
