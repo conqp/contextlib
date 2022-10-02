@@ -1,38 +1,32 @@
-use contextlib::{with, Contextmanager};
+use contextlib::with;
 
-#[derive(Debug)]
-struct TestCTM {
-    name: String,
-    calls: i64,
-}
+mod counter;
+use counter::Counter;
 
-impl TestCTM {
-    fn new() -> Self {
-        Self {
-            name: "Test context manager".to_string(),
-            calls: 0,
-        }
-    }
-}
+mod timer;
+use timer::Timer;
 
-impl Contextmanager for TestCTM {
-    fn enter(&mut self) {
-        assert_eq!(0, self.calls);
-        self.calls += 1;
-        assert_eq!(1, self.calls);
-    }
+#[test]
+fn test_basic_ctm() {
+    let mut counter = Counter::new();
 
-    fn exit(&mut self) {
-        assert_eq!(1, self.calls);
-        self.calls -= 1;
-        assert_eq!(0, self.calls);
-    }
+    with(&mut counter, |this| {
+        assert_eq!(1, this.calls());
+    });
+    assert_eq!(0, counter.calls());
 }
 
 #[test]
-fn test_contextmanager() {
-    with(&mut TestCTM::new(), |this| {
-        assert_eq!(1, this.calls);
-        this.name = "New name".to_string();
+fn test_timer() {
+    let mut timer = Timer::new();
+
+    with(&mut timer, |this| {
+        assert!(this.start().is_some());
+        println!("Start: {:?}, end: {:?}", this.start(), this.end());
+        assert!(this.end().is_none());
+        assert!(this.duration().is_none());
     });
+    assert!(timer.end().is_some());
+    assert!(timer.duration().is_some());
+    println!("Duration: {:?}", timer.duration());
 }
